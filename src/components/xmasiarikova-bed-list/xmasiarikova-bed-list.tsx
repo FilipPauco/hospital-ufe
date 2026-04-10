@@ -11,13 +11,23 @@ import { BedsApi, Bed, Configuration } from '../../api/hospital-wl';
     .stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
     .stat-chip {
       display: flex; align-items: center; gap: 6px;
-      background: var(--md-sys-color-surface-variant, #e7e0ec);
+      background: var(--md-sys-color-surface-variant);
+      color: var(--md-sys-color-on-surface-variant);
       border-radius: 8px; padding: 6px 12px; font-size: 0.85rem;
     }
     .stat-chip md-icon { font-size: 18px; }
-    .stat-chip.occupied { background: #fde8e8; }
-    .stat-chip.free { background: #e8f5e9; }
-    .stat-chip.oos { background: #fff3e0; }
+    .stat-chip.occupied {
+      background: var(--md-sys-color-error-container);
+      color: var(--md-sys-color-on-error-container);
+    }
+    .stat-chip.free {
+      background: var(--md-sys-color-tertiary-container);
+      color: var(--md-sys-color-on-tertiary-container);
+    }
+    .stat-chip.oos {
+      background: var(--md-sys-color-secondary-container);
+      color: var(--md-sys-color-on-secondary-container);
+    }
     .error { color: var(--md-sys-color-error, red); padding: 16px; }
   `
 })
