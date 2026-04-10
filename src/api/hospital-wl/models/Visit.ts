@@ -33,10 +33,10 @@ export interface Visit {
     patientId: string;
     /**
      * Date of the visit
-     * @type {Date}
+     * @type {string}
      * @memberof Visit
      */
-    date: Date;
+    date: string;
     /**
      * Time of the visit (HH:MM)
      * @type {string}
@@ -82,7 +82,7 @@ export function VisitFromJSONTyped(json: any, ignoreDiscriminator: boolean): Vis
         
         'id': json['id'],
         'patientId': json['patientId'],
-        'date': (new Date(json['date'])),
+        'date': json['date'],
         'time': json['time'],
         'doctors': !exists(json, 'doctors') ? undefined : json['doctors'],
         'clinicalNotes': !exists(json, 'clinicalNotes') ? undefined : json['clinicalNotes'],
@@ -100,7 +100,7 @@ export function VisitToJSON(value?: Visit | null): any {
         
         'id': value.id,
         'patientId': value.patientId,
-        'date': (value.date.toISOString().substr(0,10)),
+        'date': value.date,
         'time': value.time,
         'doctors': value.doctors,
         'clinicalNotes': value.clinicalNotes,
