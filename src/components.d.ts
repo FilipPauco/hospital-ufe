@@ -6,7 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface XmesiarikovaBedApp {
+    interface XmasiarikovaBedApp {
         "apiBase": string;
         /**
           * @default ""
@@ -14,13 +14,22 @@ export namespace Components {
         "basePath": string;
         "wardId": string;
     }
-    interface XmesiarikovaBedEditor {
+    interface XmasiarikovaBedEditor {
         "apiBase": string;
         "bedId": string;
         "wardId": string;
     }
-    interface XmesiarikovaBedList {
+    interface XmasiarikovaBedList {
         "apiBase": string;
+        "wardId": string;
+    }
+    interface XpaucofHospitalApp {
+        /**
+          * @default ''
+         */
+        "basePath": string;
+        "bedApiBase": string;
+        "visitApiBase": string;
         "wardId": string;
     }
     interface XpaucofVisitApp {
@@ -41,13 +50,13 @@ export namespace Components {
         "wardId": string;
     }
 }
-export interface XmesiarikovaBedEditorCustomEvent<T> extends CustomEvent<T> {
+export interface XmasiarikovaBedEditorCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLXmesiarikovaBedEditorElement;
+    target: HTMLXmasiarikovaBedEditorElement;
 }
-export interface XmesiarikovaBedListCustomEvent<T> extends CustomEvent<T> {
+export interface XmasiarikovaBedListCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLXmesiarikovaBedListElement;
+    target: HTMLXmasiarikovaBedListElement;
 }
 export interface XpaucofVisitEditorCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -58,45 +67,51 @@ export interface XpaucofVisitListCustomEvent<T> extends CustomEvent<T> {
     target: HTMLXpaucofVisitListElement;
 }
 declare global {
-    interface HTMLXmesiarikovaBedAppElement extends Components.XmesiarikovaBedApp, HTMLStencilElement {
+    interface HTMLXmasiarikovaBedAppElement extends Components.XmasiarikovaBedApp, HTMLStencilElement {
     }
-    var HTMLXmesiarikovaBedAppElement: {
-        prototype: HTMLXmesiarikovaBedAppElement;
-        new (): HTMLXmesiarikovaBedAppElement;
+    var HTMLXmasiarikovaBedAppElement: {
+        prototype: HTMLXmasiarikovaBedAppElement;
+        new (): HTMLXmasiarikovaBedAppElement;
     };
-    interface HTMLXmesiarikovaBedEditorElementEventMap {
+    interface HTMLXmasiarikovaBedEditorElementEventMap {
         "editor-closed": string;
     }
-    interface HTMLXmesiarikovaBedEditorElement extends Components.XmesiarikovaBedEditor, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLXmesiarikovaBedEditorElementEventMap>(type: K, listener: (this: HTMLXmesiarikovaBedEditorElement, ev: XmesiarikovaBedEditorCustomEvent<HTMLXmesiarikovaBedEditorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+    interface HTMLXmasiarikovaBedEditorElement extends Components.XmasiarikovaBedEditor, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLXmasiarikovaBedEditorElementEventMap>(type: K, listener: (this: HTMLXmasiarikovaBedEditorElement, ev: XmasiarikovaBedEditorCustomEvent<HTMLXmasiarikovaBedEditorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLXmesiarikovaBedEditorElementEventMap>(type: K, listener: (this: HTMLXmesiarikovaBedEditorElement, ev: XmesiarikovaBedEditorCustomEvent<HTMLXmesiarikovaBedEditorElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLXmasiarikovaBedEditorElementEventMap>(type: K, listener: (this: HTMLXmasiarikovaBedEditorElement, ev: XmasiarikovaBedEditorCustomEvent<HTMLXmasiarikovaBedEditorElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
-    var HTMLXmesiarikovaBedEditorElement: {
-        prototype: HTMLXmesiarikovaBedEditorElement;
-        new (): HTMLXmesiarikovaBedEditorElement;
+    var HTMLXmasiarikovaBedEditorElement: {
+        prototype: HTMLXmasiarikovaBedEditorElement;
+        new (): HTMLXmasiarikovaBedEditorElement;
     };
-    interface HTMLXmesiarikovaBedListElementEventMap {
+    interface HTMLXmasiarikovaBedListElementEventMap {
         "bed-clicked": string;
     }
-    interface HTMLXmesiarikovaBedListElement extends Components.XmesiarikovaBedList, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLXmesiarikovaBedListElementEventMap>(type: K, listener: (this: HTMLXmesiarikovaBedListElement, ev: XmesiarikovaBedListCustomEvent<HTMLXmesiarikovaBedListElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+    interface HTMLXmasiarikovaBedListElement extends Components.XmasiarikovaBedList, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLXmasiarikovaBedListElementEventMap>(type: K, listener: (this: HTMLXmasiarikovaBedListElement, ev: XmasiarikovaBedListCustomEvent<HTMLXmasiarikovaBedListElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLXmesiarikovaBedListElementEventMap>(type: K, listener: (this: HTMLXmesiarikovaBedListElement, ev: XmesiarikovaBedListCustomEvent<HTMLXmesiarikovaBedListElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLXmasiarikovaBedListElementEventMap>(type: K, listener: (this: HTMLXmasiarikovaBedListElement, ev: XmasiarikovaBedListCustomEvent<HTMLXmasiarikovaBedListElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
-    var HTMLXmesiarikovaBedListElement: {
-        prototype: HTMLXmesiarikovaBedListElement;
-        new (): HTMLXmesiarikovaBedListElement;
+    var HTMLXmasiarikovaBedListElement: {
+        prototype: HTMLXmasiarikovaBedListElement;
+        new (): HTMLXmasiarikovaBedListElement;
+    };
+    interface HTMLXpaucofHospitalAppElement extends Components.XpaucofHospitalApp, HTMLStencilElement {
+    }
+    var HTMLXpaucofHospitalAppElement: {
+        prototype: HTMLXpaucofHospitalAppElement;
+        new (): HTMLXpaucofHospitalAppElement;
     };
     interface HTMLXpaucofVisitAppElement extends Components.XpaucofVisitApp, HTMLStencilElement {
     }
@@ -139,16 +154,17 @@ declare global {
         new (): HTMLXpaucofVisitListElement;
     };
     interface HTMLElementTagNameMap {
-        "xmesiarikova-bed-app": HTMLXmesiarikovaBedAppElement;
-        "xmesiarikova-bed-editor": HTMLXmesiarikovaBedEditorElement;
-        "xmesiarikova-bed-list": HTMLXmesiarikovaBedListElement;
+        "xmasiarikova-bed-app": HTMLXmasiarikovaBedAppElement;
+        "xmasiarikova-bed-editor": HTMLXmasiarikovaBedEditorElement;
+        "xmasiarikova-bed-list": HTMLXmasiarikovaBedListElement;
+        "xpaucof-hospital-app": HTMLXpaucofHospitalAppElement;
         "xpaucof-visit-app": HTMLXpaucofVisitAppElement;
         "xpaucof-visit-editor": HTMLXpaucofVisitEditorElement;
         "xpaucof-visit-list": HTMLXpaucofVisitListElement;
     }
 }
 declare namespace LocalJSX {
-    interface XmesiarikovaBedApp {
+    interface XmasiarikovaBedApp {
         "apiBase"?: string;
         /**
           * @default ""
@@ -156,15 +172,24 @@ declare namespace LocalJSX {
         "basePath"?: string;
         "wardId"?: string;
     }
-    interface XmesiarikovaBedEditor {
+    interface XmasiarikovaBedEditor {
         "apiBase"?: string;
         "bedId"?: string;
-        "onEditor-closed"?: (event: XmesiarikovaBedEditorCustomEvent<string>) => void;
+        "onEditor-closed"?: (event: XmasiarikovaBedEditorCustomEvent<string>) => void;
         "wardId"?: string;
     }
-    interface XmesiarikovaBedList {
+    interface XmasiarikovaBedList {
         "apiBase"?: string;
-        "onBed-clicked"?: (event: XmesiarikovaBedListCustomEvent<string>) => void;
+        "onBed-clicked"?: (event: XmasiarikovaBedListCustomEvent<string>) => void;
+        "wardId"?: string;
+    }
+    interface XpaucofHospitalApp {
+        /**
+          * @default ''
+         */
+        "basePath"?: string;
+        "bedApiBase"?: string;
+        "visitApiBase"?: string;
         "wardId"?: string;
     }
     interface XpaucofVisitApp {
@@ -187,19 +212,25 @@ declare namespace LocalJSX {
         "wardId"?: string;
     }
 
-    interface XmesiarikovaBedAppAttributes {
+    interface XmasiarikovaBedAppAttributes {
         "basePath": string;
         "apiBase": string;
         "wardId": string;
     }
-    interface XmesiarikovaBedEditorAttributes {
+    interface XmasiarikovaBedEditorAttributes {
         "bedId": string;
         "wardId": string;
         "apiBase": string;
     }
-    interface XmesiarikovaBedListAttributes {
+    interface XmasiarikovaBedListAttributes {
         "apiBase": string;
         "wardId": string;
+    }
+    interface XpaucofHospitalAppAttributes {
+        "visitApiBase": string;
+        "bedApiBase": string;
+        "wardId": string;
+        "basePath": string;
     }
     interface XpaucofVisitAppAttributes {
         "basePath": string;
@@ -217,9 +248,10 @@ declare namespace LocalJSX {
     }
 
     interface IntrinsicElements {
-        "xmesiarikova-bed-app": Omit<XmesiarikovaBedApp, keyof XmesiarikovaBedAppAttributes> & { [K in keyof XmesiarikovaBedApp & keyof XmesiarikovaBedAppAttributes]?: XmesiarikovaBedApp[K] } & { [K in keyof XmesiarikovaBedApp & keyof XmesiarikovaBedAppAttributes as `attr:${K}`]?: XmesiarikovaBedAppAttributes[K] } & { [K in keyof XmesiarikovaBedApp & keyof XmesiarikovaBedAppAttributes as `prop:${K}`]?: XmesiarikovaBedApp[K] };
-        "xmesiarikova-bed-editor": Omit<XmesiarikovaBedEditor, keyof XmesiarikovaBedEditorAttributes> & { [K in keyof XmesiarikovaBedEditor & keyof XmesiarikovaBedEditorAttributes]?: XmesiarikovaBedEditor[K] } & { [K in keyof XmesiarikovaBedEditor & keyof XmesiarikovaBedEditorAttributes as `attr:${K}`]?: XmesiarikovaBedEditorAttributes[K] } & { [K in keyof XmesiarikovaBedEditor & keyof XmesiarikovaBedEditorAttributes as `prop:${K}`]?: XmesiarikovaBedEditor[K] };
-        "xmesiarikova-bed-list": Omit<XmesiarikovaBedList, keyof XmesiarikovaBedListAttributes> & { [K in keyof XmesiarikovaBedList & keyof XmesiarikovaBedListAttributes]?: XmesiarikovaBedList[K] } & { [K in keyof XmesiarikovaBedList & keyof XmesiarikovaBedListAttributes as `attr:${K}`]?: XmesiarikovaBedListAttributes[K] } & { [K in keyof XmesiarikovaBedList & keyof XmesiarikovaBedListAttributes as `prop:${K}`]?: XmesiarikovaBedList[K] };
+        "xmasiarikova-bed-app": Omit<XmasiarikovaBedApp, keyof XmasiarikovaBedAppAttributes> & { [K in keyof XmasiarikovaBedApp & keyof XmasiarikovaBedAppAttributes]?: XmasiarikovaBedApp[K] } & { [K in keyof XmasiarikovaBedApp & keyof XmasiarikovaBedAppAttributes as `attr:${K}`]?: XmasiarikovaBedAppAttributes[K] } & { [K in keyof XmasiarikovaBedApp & keyof XmasiarikovaBedAppAttributes as `prop:${K}`]?: XmasiarikovaBedApp[K] };
+        "xmasiarikova-bed-editor": Omit<XmasiarikovaBedEditor, keyof XmasiarikovaBedEditorAttributes> & { [K in keyof XmasiarikovaBedEditor & keyof XmasiarikovaBedEditorAttributes]?: XmasiarikovaBedEditor[K] } & { [K in keyof XmasiarikovaBedEditor & keyof XmasiarikovaBedEditorAttributes as `attr:${K}`]?: XmasiarikovaBedEditorAttributes[K] } & { [K in keyof XmasiarikovaBedEditor & keyof XmasiarikovaBedEditorAttributes as `prop:${K}`]?: XmasiarikovaBedEditor[K] };
+        "xmasiarikova-bed-list": Omit<XmasiarikovaBedList, keyof XmasiarikovaBedListAttributes> & { [K in keyof XmasiarikovaBedList & keyof XmasiarikovaBedListAttributes]?: XmasiarikovaBedList[K] } & { [K in keyof XmasiarikovaBedList & keyof XmasiarikovaBedListAttributes as `attr:${K}`]?: XmasiarikovaBedListAttributes[K] } & { [K in keyof XmasiarikovaBedList & keyof XmasiarikovaBedListAttributes as `prop:${K}`]?: XmasiarikovaBedList[K] };
+        "xpaucof-hospital-app": Omit<XpaucofHospitalApp, keyof XpaucofHospitalAppAttributes> & { [K in keyof XpaucofHospitalApp & keyof XpaucofHospitalAppAttributes]?: XpaucofHospitalApp[K] } & { [K in keyof XpaucofHospitalApp & keyof XpaucofHospitalAppAttributes as `attr:${K}`]?: XpaucofHospitalAppAttributes[K] } & { [K in keyof XpaucofHospitalApp & keyof XpaucofHospitalAppAttributes as `prop:${K}`]?: XpaucofHospitalApp[K] };
         "xpaucof-visit-app": Omit<XpaucofVisitApp, keyof XpaucofVisitAppAttributes> & { [K in keyof XpaucofVisitApp & keyof XpaucofVisitAppAttributes]?: XpaucofVisitApp[K] } & { [K in keyof XpaucofVisitApp & keyof XpaucofVisitAppAttributes as `attr:${K}`]?: XpaucofVisitAppAttributes[K] } & { [K in keyof XpaucofVisitApp & keyof XpaucofVisitAppAttributes as `prop:${K}`]?: XpaucofVisitApp[K] };
         "xpaucof-visit-editor": Omit<XpaucofVisitEditor, keyof XpaucofVisitEditorAttributes> & { [K in keyof XpaucofVisitEditor & keyof XpaucofVisitEditorAttributes]?: XpaucofVisitEditor[K] } & { [K in keyof XpaucofVisitEditor & keyof XpaucofVisitEditorAttributes as `attr:${K}`]?: XpaucofVisitEditorAttributes[K] } & { [K in keyof XpaucofVisitEditor & keyof XpaucofVisitEditorAttributes as `prop:${K}`]?: XpaucofVisitEditor[K] };
         "xpaucof-visit-list": Omit<XpaucofVisitList, keyof XpaucofVisitListAttributes> & { [K in keyof XpaucofVisitList & keyof XpaucofVisitListAttributes]?: XpaucofVisitList[K] } & { [K in keyof XpaucofVisitList & keyof XpaucofVisitListAttributes as `attr:${K}`]?: XpaucofVisitListAttributes[K] } & { [K in keyof XpaucofVisitList & keyof XpaucofVisitListAttributes as `prop:${K}`]?: XpaucofVisitList[K] };
@@ -229,9 +261,10 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "xmesiarikova-bed-app": LocalJSX.IntrinsicElements["xmesiarikova-bed-app"] & JSXBase.HTMLAttributes<HTMLXmesiarikovaBedAppElement>;
-            "xmesiarikova-bed-editor": LocalJSX.IntrinsicElements["xmesiarikova-bed-editor"] & JSXBase.HTMLAttributes<HTMLXmesiarikovaBedEditorElement>;
-            "xmesiarikova-bed-list": LocalJSX.IntrinsicElements["xmesiarikova-bed-list"] & JSXBase.HTMLAttributes<HTMLXmesiarikovaBedListElement>;
+            "xmasiarikova-bed-app": LocalJSX.IntrinsicElements["xmasiarikova-bed-app"] & JSXBase.HTMLAttributes<HTMLXmasiarikovaBedAppElement>;
+            "xmasiarikova-bed-editor": LocalJSX.IntrinsicElements["xmasiarikova-bed-editor"] & JSXBase.HTMLAttributes<HTMLXmasiarikovaBedEditorElement>;
+            "xmasiarikova-bed-list": LocalJSX.IntrinsicElements["xmasiarikova-bed-list"] & JSXBase.HTMLAttributes<HTMLXmasiarikovaBedListElement>;
+            "xpaucof-hospital-app": LocalJSX.IntrinsicElements["xpaucof-hospital-app"] & JSXBase.HTMLAttributes<HTMLXpaucofHospitalAppElement>;
             "xpaucof-visit-app": LocalJSX.IntrinsicElements["xpaucof-visit-app"] & JSXBase.HTMLAttributes<HTMLXpaucofVisitAppElement>;
             "xpaucof-visit-editor": LocalJSX.IntrinsicElements["xpaucof-visit-editor"] & JSXBase.HTMLAttributes<HTMLXpaucofVisitEditorElement>;
             "xpaucof-visit-list": LocalJSX.IntrinsicElements["xpaucof-visit-list"] & JSXBase.HTMLAttributes<HTMLXpaucofVisitListElement>;

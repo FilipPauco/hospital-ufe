@@ -4,6 +4,12 @@ import { VisitsApi, Visit, Configuration } from '../../api/hospital-wl';
 @Component({
   tag: 'xpaucof-visit-list',
   shadow: true,
+  styles: `
+    :host { display: block; }
+    .header { padding: 16px 16px 0; }
+    h2 { margin: 0 0 4px; font-size: 1.25rem; font-weight: 500; }
+    .error { color: var(--md-sys-color-error, red); padding: 16px; }
+  `
 })
 export class XpaucofVisitList {
   @Event({ eventName: "visit-clicked" }) visitClicked: EventEmitter<string>;
@@ -39,15 +45,21 @@ export class XpaucofVisitList {
   render() {
     return (
       <Host>
+        <div class="header">
+          <h2>Vizity pacientov</h2>
+        </div>
         {this.errorMessage
           ? <div class="error">{this.errorMessage}</div>
           : <md-list>
               {this.visits.map(visit =>
-                <md-list-item onClick={() => this.visitClicked.emit(visit.id)}>
-                  <div slot="headline">{visit.patientId}</div>
-                  <div slot="supporting-text">{visit.date} {visit.time}</div>
-                  <md-icon slot="start">event</md-icon>
-                </md-list-item>
+                [
+                  <md-list-item onClick={() => this.visitClicked.emit(visit.id)}>
+                    <div slot="headline">{visit.patientId}</div>
+                    <div slot="supporting-text">{visit.date} {visit.time}</div>
+                    <md-icon slot="start">event</md-icon>
+                  </md-list-item>,
+                  <md-divider></md-divider>
+                ]
               )}
             </md-list>
         }

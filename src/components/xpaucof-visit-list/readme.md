@@ -24,11 +24,13 @@
 
 ### Used by
 
+ - [xpaucof-hospital-app](../xpaucof-hospital-app)
  - [xpaucof-visit-app](../xpaucof-visit-app)
 
 ### Graph
 ```mermaid
 graph TD;
+  xpaucof-hospital-app --> xpaucof-visit-list
   xpaucof-visit-app --> xpaucof-visit-list
   style xpaucof-visit-list fill:#f9f,stroke:#333,stroke-width:4px
 ```

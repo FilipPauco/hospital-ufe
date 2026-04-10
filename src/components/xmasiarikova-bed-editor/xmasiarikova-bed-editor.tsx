@@ -1,11 +1,17 @@
-import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
+﻿import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
 import { BedsApi, Bed, Configuration } from '../../api/hospital-wl';
 
 @Component({
-  tag: 'xmesiarikova-bed-editor',
+  tag: 'xmasiarikova-bed-editor',
   shadow: true,
+  styles: `
+    :host { display: block; }
+    form { display: flex; flex-direction: column; gap: 16px; padding: 16px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 8px; }
+    .error { color: var(--md-sys-color-error, red); padding: 16px; }
+  `
 })
-export class XmesiarikováBedEditor {
+export class XmasiarikovaBedEditor {
   @Prop() bedId: string;
   @Prop() wardId: string;
   @Prop() apiBase: string;

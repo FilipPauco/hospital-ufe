@@ -12,10 +12,11 @@
     <script nomodule src="/build/hospital-ufe.js"></script>
   </head>
   <body style="font-family: 'Roboto'; ">
-    <h2>Vizita (xpaucof)</h2>
-    <xpaucof-visit-app ward-id="bobulova-ward" api-base="http://localhost:5000/api" base-path="/xpaucof-hospital-wl/"></xpaucof-visit-app>
-    <hr/>
-    <h2>Lôžko (xmesiarikova)</h2>
-    <xmesiarikova-bed-app ward-id="bobulova-ward" api-base="http://localhost:5000/api" base-path="/xmesiarikova-hospital-wl/"></xmesiarikova-bed-app>
+    <xpaucof-hospital-app
+      ward-id="bobulova-ward"
+      visit-api-base="http://localhost:5000/api"
+      bed-api-base="http://localhost:5000/api"
+      base-path="/">
+    </xpaucof-hospital-app>
   </body>
 </html>

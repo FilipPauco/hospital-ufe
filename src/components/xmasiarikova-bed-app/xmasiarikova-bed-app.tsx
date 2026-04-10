@@ -1,14 +1,14 @@
-import { Component, Host, Prop, State, h } from '@stencil/core';
+﻿import { Component, Host, Prop, State, h } from '@stencil/core';
 
 declare global {
   interface Window { navigation: any; }
 }
 
 @Component({
-  tag: 'xmesiarikova-bed-app',
+  tag: 'xmasiarikova-bed-app',
   shadow: true,
 })
-export class XmesiarikováBedApp {
+export class XmasiarikovaBedApp {
   @State() private relativePath = "";
   @Prop() basePath: string = "";
   @Prop() apiBase: string;
@@ -51,13 +51,13 @@ export class XmesiarikováBedApp {
     return (
       <Host>
         {element === "editor"
-          ? <xmesiarikova-bed-editor bed-id={bedId}
+          ? <xmasiarikova-bed-editor bed-id={bedId}
               ward-id={this.wardId} api-base={this.apiBase}
               oneditor-closed={() => navigate("./list")}>
-            </xmesiarikova-bed-editor>
-          : <xmesiarikova-bed-list ward-id={this.wardId} api-base={this.apiBase}
+            </xmasiarikova-bed-editor>
+          : <xmasiarikova-bed-list ward-id={this.wardId} api-base={this.apiBase}
               onbed-clicked={(ev: CustomEvent<string>) => navigate("./entry/" + ev.detail)}>
-            </xmesiarikova-bed-list>
+            </xmasiarikova-bed-list>
         }
       </Host>
     );

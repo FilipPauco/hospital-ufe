@@ -4,6 +4,12 @@ import { VisitsApi, Visit, Configuration } from '../../api/hospital-wl';
 @Component({
   tag: 'xpaucof-visit-editor',
   shadow: true,
+  styles: `
+    :host { display: block; }
+    form { display: flex; flex-direction: column; gap: 16px; padding: 16px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 8px; }
+    .error { color: var(--md-sys-color-error, red); padding: 16px; }
+  `
 })
 export class XpaucofVisitEditor {
   @Prop() visitId: string;
@@ -128,7 +134,7 @@ export class XpaucofVisitEditor {
           </md-filled-text-field>
 
           <md-filled-text-field label="Čas"
-            required pattern="\d{2}:\d{2}" value={this.entry?.time}
+            type="time" required value={this.entry?.time}
             oninput={(ev: InputEvent) => {
               if (this.entry) { this.entry.time = this.handleInputEvent(ev); }
             }}>
