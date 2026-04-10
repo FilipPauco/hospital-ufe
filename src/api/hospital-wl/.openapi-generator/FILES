@@ -1,0 +1,9 @@
+apis/BedsApi.ts
+apis/VisitsApi.ts
+apis/index.ts
+index.ts
+models/Bed.ts
+models/Visit.ts
+models/Ward.ts
+models/index.ts
+runtime.ts

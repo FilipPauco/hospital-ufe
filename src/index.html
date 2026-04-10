@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+  <head>
+    <base href="/"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <title>Hospital Ward Management</title>
+
+    <script type="module" src="/build/hospital-ufe.esm.js"></script>
+    <script nomodule src="/build/hospital-ufe.js"></script>
+  </head>
+  <body style="font-family: 'Roboto'; ">
+    <h2>Vizita (xpaucof)</h2>
+    <xpaucof-visit-app ward-id="bobulova-ward" api-base="http://localhost:5000/api" base-path="/xpaucof-hospital-wl/"></xpaucof-visit-app>
+    <hr/>
+    <h2>Lôžko (xmesiarikova)</h2>
+    <xmesiarikova-bed-app ward-id="bobulova-ward" api-base="http://localhost:5000/api" base-path="/xmesiarikova-hospital-wl/"></xmesiarikova-bed-app>
+  </body>
+</html>
