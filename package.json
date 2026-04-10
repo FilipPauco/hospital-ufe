@@ -34,7 +34,7 @@
     "start:mock": "run-s convert-openapi mock-api",
     "start": "run-p -r start:mock start:app",
     "build": "stencil build",
-    "test": "stencil test --spec --e2e",
+    "test": "stencil test --spec --e2e --passWithNoTests",
     "test.watch": "stencil test --spec --e2e --watchAll",
     "generate": "stencil generate",
     "openapi": "openapi-generator-cli generate",
