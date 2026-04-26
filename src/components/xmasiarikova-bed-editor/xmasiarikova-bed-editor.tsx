@@ -5,10 +5,53 @@ import { BedsApi, Bed, Configuration } from '../../api/hospital-wl';
   tag: 'xmasiarikova-bed-editor',
   shadow: true,
   styles: `
-    :host { display: block; }
-    form { display: flex; flex-direction: column; gap: 16px; padding: 16px; }
-    .actions { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 8px; }
-    .error { color: var(--md-sys-color-error, red); padding: 16px; }
+    :host {
+      display: block;
+      padding: 16px;
+      background: linear-gradient(180deg, var(--md-sys-color-surface-container-low) 0%, var(--md-sys-color-surface) 100%);
+      min-height: 100%;
+      box-sizing: border-box;
+    }
+    .panel {
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--md-sys-color-surface-container-high);
+      border: 1px solid color-mix(in srgb, var(--md-sys-color-outline-variant) 70%, transparent);
+    }
+    .header {
+      padding: 16px 16px 0;
+    }
+    h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .sub-title {
+      margin-top: 4px;
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 0.9rem;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 16px;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid color-mix(in srgb, var(--md-sys-color-outline-variant) 70%, transparent);
+      margin-top: 8px;
+    }
+    .error {
+      color: var(--md-sys-color-error);
+      background: var(--md-sys-color-error-container);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 16px;
+    }
   `
 })
 export class XmasiarikovaBedEditor {
@@ -114,61 +157,66 @@ export class XmasiarikovaBedEditor {
     }
     return (
       <Host>
-        <form ref={el => this.formElement = el}>
-          <md-filled-text-field label="Číslo lôžka"
-            required pattern=".*\S.*" value={this.entry?.number}
-            oninput={(ev: InputEvent) => {
-              if (this.entry) { this.entry.number = this.handleInputEvent(ev); }
-            }}>
-            <md-icon slot="leading-icon">bed</md-icon>
-          </md-filled-text-field>
-
-          <md-filled-select label="Stav"
-            value={this.entry?.status}
-            onchange={(ev: Event) => {
-              if (this.entry) {
-                this.entry.status = (ev.target as HTMLSelectElement).value as any;
-                this.isValid = this.formElement?.reportValidity() ?? false;
-              }
-            }}>
-            <md-select-option value="free">
-              <div slot="headline">Voľné</div>
-            </md-select-option>
-            <md-select-option value="occupied">
-              <div slot="headline">Obsadené</div>
-            </md-select-option>
-            <md-select-option value="out-of-service">
-              <div slot="headline">Mimo prevádzky</div>
-            </md-select-option>
-          </md-filled-select>
-
-          <md-filled-text-field label="ID pacienta"
-            value={this.entry?.patientId}
-            oninput={(ev: InputEvent) => {
-              if (this.entry) { this.entry.patientId = this.handleInputEvent(ev); }
-            }}>
-            <md-icon slot="leading-icon">person</md-icon>
-          </md-filled-text-field>
-
-          <div class="actions">
-            <md-filled-tonal-button
-              disabled={!this.isValid}
-              onclick={() => this.updateBed()}>
-              <md-icon slot="icon">save</md-icon>
-              Uložiť
-            </md-filled-tonal-button>
-            {this.bedId !== "@new" &&
-              <md-outlined-button onclick={() => this.deleteBed()}>
-                <md-icon slot="icon">delete</md-icon>
-                Zmazať
-              </md-outlined-button>
-            }
-            <md-outlined-button onclick={() => this.editorClosed.emit("cancel")}>
-              <md-icon slot="icon">close</md-icon>
-              Zatvoriť
-            </md-outlined-button>
+        <div class="panel">
+          <div class="header">
+            <h2>{this.bedId === "@new" ? "Nové lôžko" : "Detail lôžka"}</h2>
           </div>
-        </form>
+          <form ref={el => this.formElement = el}>
+            <md-filled-text-field label="Číslo lôžka"
+              required pattern=".*\S.*" value={this.entry?.number}
+              oninput={(ev: InputEvent) => {
+                if (this.entry) { this.entry.number = this.handleInputEvent(ev); }
+              }}>
+              <md-icon slot="leading-icon">bed</md-icon>
+            </md-filled-text-field>
+
+            <md-filled-select label="Stav"
+              value={this.entry?.status}
+              onchange={(ev: Event) => {
+                if (this.entry) {
+                  this.entry.status = (ev.target as HTMLSelectElement).value as any;
+                  this.isValid = this.formElement?.reportValidity() ?? false;
+                }
+              }}>
+              <md-select-option value="free">
+                <div slot="headline">Voľné</div>
+              </md-select-option>
+              <md-select-option value="occupied">
+                <div slot="headline">Obsadené</div>
+              </md-select-option>
+              <md-select-option value="out-of-service">
+                <div slot="headline">Mimo prevádzky</div>
+              </md-select-option>
+            </md-filled-select>
+
+            <md-filled-text-field label="ID pacienta"
+              value={this.entry?.patientId}
+              oninput={(ev: InputEvent) => {
+                if (this.entry) { this.entry.patientId = this.handleInputEvent(ev); }
+              }}>
+              <md-icon slot="leading-icon">person</md-icon>
+            </md-filled-text-field>
+
+            <div class="actions">
+              <md-filled-tonal-button
+                disabled={!this.isValid}
+                onclick={() => this.updateBed()}>
+                <md-icon slot="icon">save</md-icon>
+                Uložiť
+              </md-filled-tonal-button>
+              {this.bedId !== "@new" &&
+                <md-outlined-button onclick={() => this.deleteBed()}>
+                  <md-icon slot="icon">delete</md-icon>
+                  Zmazať
+                </md-outlined-button>
+              }
+              <md-outlined-button onclick={() => this.editorClosed.emit("cancel")}>
+                <md-icon slot="icon">close</md-icon>
+                Zatvoriť
+              </md-outlined-button>
+            </div>
+          </form>
+        </div>
       </Host>
     );
   }
