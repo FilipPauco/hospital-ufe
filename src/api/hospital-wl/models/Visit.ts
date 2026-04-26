@@ -32,6 +32,12 @@ export interface Visit {
      */
     patientId: string;
     /**
+     * Unique identifier of the bed where visit took place
+     * @type {string}
+     * @memberof Visit
+     */
+    bedId: string;
+    /**
      * Date of the visit
      * @type {string}
      * @memberof Visit
@@ -64,6 +70,7 @@ export function instanceOfVisit(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "id" in value;
     isInstance = isInstance && "patientId" in value;
+    isInstance = isInstance && "bedId" in value;
     isInstance = isInstance && "date" in value;
     isInstance = isInstance && "time" in value;
 
@@ -82,6 +89,7 @@ export function VisitFromJSONTyped(json: any, ignoreDiscriminator: boolean): Vis
         
         'id': json['id'],
         'patientId': json['patientId'],
+        'bedId': json['bedId'],
         'date': json['date'],
         'time': json['time'],
         'doctors': !exists(json, 'doctors') ? undefined : json['doctors'],
@@ -94,12 +102,13 @@ export function VisitToJSON(value?: Visit | null): any {
         return undefined;
     }
     if (value === null) {
-        return null;
+        return value;
     }
     return {
         
         'id': value.id,
         'patientId': value.patientId,
+        'bedId': value.bedId,
         'date': value.date,
         'time': value.time,
         'doctors': value.doctors,

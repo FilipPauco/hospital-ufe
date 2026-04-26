@@ -1,5 +1,5 @@
 import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
-import { VisitsApi, Visit, Configuration } from '../../api/hospital-wl';
+import { VisitsApi, BedsApi, Bed, Visit, Configuration } from '../../api/hospital-wl';
 
 @Component({
   tag: 'xpaucof-visit-editor',
@@ -12,27 +12,60 @@ import { VisitsApi, Visit, Configuration } from '../../api/hospital-wl';
   `
 })
 export class XpaucofVisitEditor {
-  @Prop() visitId: string;
-  @Prop() wardId: string;
-  @Prop() apiBase: string;
+  @Prop() visitId?: string;
+  @Prop() wardId?: string;
+  @Prop() apiBase?: string;
 
-  @Event({ eventName: "editor-closed" }) editorClosed: EventEmitter<string>;
-  @State() entry: Visit;
-  @State() errorMessage: string;
-  @State() isValid: boolean;
+  @Event({ eventName: "editor-closed" }) editorClosed!: EventEmitter<string>;
+  @State() private entry: Visit = {
+    id: "@new",
+    patientId: "",
+    bedId: "",
+    date: new Date().toISOString().split('T')[0],
+    time: "08:00",
+    doctors: [],
+    clinicalNotes: "",
+  };
+  @State() private beds: Bed[] = [];
+  @State() private errorMessage: string = "";
+  @State() private isValid: boolean = false;
 
-  private formElement: HTMLFormElement;
+  private formElement?: HTMLFormElement;
 
   async componentWillLoad() {
-    this.getVisitAsync();
+    await Promise.all([
+      this.getBedsAsync(),
+      this.getVisitAsync(),
+    ]);
   }
 
-  private async getVisitAsync(): Promise<Visit> {
+  private async getBedsAsync(): Promise<void> {
+    if (!this.wardId) {
+      this.errorMessage = "Missing wardId";
+      return;
+    }
+    try {
+      const configuration = new Configuration({ basePath: this.apiBase });
+      const bedsApi = new BedsApi(configuration);
+      const response = await bedsApi.getBedsRaw({ wardId: this.wardId });
+
+      if (response.raw.status < 299) {
+        this.beds = await response.value();
+      } else {
+        this.errorMessage = `Cannot retrieve beds: ${response.raw.statusText}`;
+      }
+    } catch (err: any) {
+      this.errorMessage = `Cannot retrieve beds: ${err.message || "unknown"}`;
+    }
+  }
+
+  private async getVisitAsync(): Promise<Visit | undefined> {
     if (this.visitId === "@new") {
       this.isValid = false;
       this.entry = {
         id: "@new",
         patientId: "",
+        bedId: "",
         date: new Date().toISOString().split('T')[0],
         time: "08:00",
         doctors: [],
@@ -51,6 +84,10 @@ export class XpaucofVisitEditor {
       });
 
       const visitsApi = new VisitsApi(configuration);
+      if (!this.wardId || !this.visitId) {
+        this.errorMessage = "Missing wardId or visitId";
+        return undefined;
+      }
       const response = await visitsApi.getVisitRaw({ wardId: this.wardId, visitId: this.visitId });
 
       if (response.raw.status < 299) {
@@ -66,12 +103,21 @@ export class XpaucofVisitEditor {
   }
 
   private handleInputEvent(ev: InputEvent): string {
-    const target = ev.target as HTMLInputElement;
+    const target = ev.target as HTMLInputElement | HTMLSelectElement;
     this.isValid = this.formElement?.reportValidity() ?? false;
     return target?.value ?? "";
   }
 
+  private getBedLabel(bed: Bed): string {
+    const status = bed.status ?? "unknown";
+    return `${bed.number} (${status})`;
+  }
+
   private async deleteVisit() {
+    if (!this.wardId || !this.visitId) {
+      this.errorMessage = "Missing wardId or visitId";
+      return;
+    }
     try {
       const configuration = new Configuration({ basePath: this.apiBase });
       const visitsApi = new VisitsApi(configuration);
@@ -87,6 +133,10 @@ export class XpaucofVisitEditor {
   }
 
   private async updateVisit() {
+    if (!this.wardId) {
+      this.errorMessage = "Missing wardId";
+      return;
+    }
     try {
       const configuration = new Configuration({ basePath: this.apiBase });
       const visitsApi = new VisitsApi(configuration);
@@ -94,6 +144,10 @@ export class XpaucofVisitEditor {
       if (this.visitId === "@new") {
         response = await visitsApi.createVisitRaw({ wardId: this.wardId, visit: this.entry });
       } else {
+        if (!this.visitId) {
+          this.errorMessage = "Missing visitId";
+          return;
+        }
         response = await visitsApi.updateVisitRaw({ wardId: this.wardId, visitId: this.visitId, visit: this.entry });
       }
       if (response.raw.status < 299) {
@@ -116,7 +170,7 @@ export class XpaucofVisitEditor {
     }
     return (
       <Host>
-        <form ref={el => this.formElement = el}>
+        <form ref={el => this.formElement = el ?? undefined}>
           <md-filled-text-field label="ID pacienta"
             required pattern=".*\S.*" value={this.entry?.patientId}
             oninput={(ev: InputEvent) => {
@@ -124,6 +178,24 @@ export class XpaucofVisitEditor {
             }}>
             <md-icon slot="leading-icon">person</md-icon>
           </md-filled-text-field>
+
+          <md-filled-select label="Lôžko" required
+            value={this.entry?.bedId ?? ""}
+            onchange={(ev: Event) => {
+              if (this.entry) {
+                this.entry.bedId = (ev.target as HTMLSelectElement).value;
+                this.isValid = this.formElement?.reportValidity() ?? false;
+              }
+            }}>
+            <md-select-option value="">
+              <div slot="headline">Vyberte lôžko</div>
+            </md-select-option>
+            {this.beds.map((bed) => (
+              <md-select-option value={bed.id}>
+                <div slot="headline">{this.getBedLabel(bed)}</div>
+              </md-select-option>
+            ))}
+          </md-filled-select>
 
           <md-filled-text-field label="Dátum"
             type="date" required value={this.entry?.date}

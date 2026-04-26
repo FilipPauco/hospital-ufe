@@ -1,5 +1,5 @@
 import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/core';
-import { VisitsApi, Visit, Configuration } from '../../api/hospital-wl';
+import { VisitsApi, BedsApi, Bed, Visit, Configuration } from '../../api/hospital-wl';
 
 @Component({
   tag: 'xpaucof-visit-list',
@@ -12,14 +12,23 @@ import { VisitsApi, Visit, Configuration } from '../../api/hospital-wl';
   `
 })
 export class XpaucofVisitList {
-  @Event({ eventName: "visit-clicked" }) visitClicked: EventEmitter<string>;
-  @Prop() apiBase: string;
-  @Prop() wardId: string;
-  @State() errorMessage: string;
+  @Event({ eventName: "visit-clicked" }) visitClicked!: EventEmitter<string>;
+  @Prop() apiBase?: string;
+  @Prop() wardId?: string;
+  @State() private errorMessage: string = "";
+  @State() private beds: Bed[] = [];
+  @State() private visits: Visit[] = [];
 
-  visits: Visit[];
+  private getBedDisplayName(bedId: string): string {
+    const bed = this.beds.find((b) => b.id === bedId);
+    return bed?.number ?? "Neznáme lôžko";
+  }
 
   private async getVisitsAsync(): Promise<Visit[]> {
+    if (!this.wardId) {
+      this.errorMessage = "Missing wardId";
+      return [];
+    }
     try {
       const configuration = new Configuration({
         basePath: this.apiBase,
@@ -38,8 +47,36 @@ export class XpaucofVisitList {
     return [];
   }
 
+  private async getBedsAsync(): Promise<Bed[]> {
+    if (!this.wardId) {
+      this.errorMessage = "Missing wardId";
+      return [];
+    }
+    try {
+      const configuration = new Configuration({
+        basePath: this.apiBase,
+      });
+
+      const bedsApi = new BedsApi(configuration);
+      const response = await bedsApi.getBedsRaw({ wardId: this.wardId });
+      if (response.raw.status < 299) {
+        return await response.value();
+      } else {
+        this.errorMessage = `Cannot retrieve beds: ${response.raw.statusText}`;
+      }
+    } catch (err: any) {
+      this.errorMessage = `Cannot retrieve beds: ${err.message || "unknown"}`;
+    }
+    return [];
+  }
+
   async componentWillLoad() {
-    this.visits = await this.getVisitsAsync();
+    const [visits, beds] = await Promise.all([
+      this.getVisitsAsync(),
+      this.getBedsAsync(),
+    ]);
+    this.visits = visits;
+    this.beds = beds;
   }
 
   render() {
@@ -55,7 +92,7 @@ export class XpaucofVisitList {
                 [
                   <md-list-item onClick={() => this.visitClicked.emit(visit.id)}>
                     <div slot="headline">{visit.patientId}</div>
-                    <div slot="supporting-text">{visit.date} {visit.time}</div>
+                    <div slot="supporting-text">{visit.date} {visit.time} | Lôžko: {this.getBedDisplayName(visit.bedId)}</div>
                     <md-icon slot="start">event</md-icon>
                   </md-list-item>,
                   <md-divider></md-divider>

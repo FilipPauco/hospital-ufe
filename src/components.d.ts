@@ -41,13 +41,13 @@ export namespace Components {
         "wardId": string;
     }
     interface XpaucofVisitEditor {
-        "apiBase": string;
-        "visitId": string;
-        "wardId": string;
+        "apiBase"?: string;
+        "visitId"?: string;
+        "wardId"?: string;
     }
     interface XpaucofVisitList {
-        "apiBase": string;
-        "wardId": string;
+        "apiBase"?: string;
+        "wardId"?: string;
     }
 }
 export interface XmasiarikovaBedEditorCustomEvent<T> extends CustomEvent<T> {
