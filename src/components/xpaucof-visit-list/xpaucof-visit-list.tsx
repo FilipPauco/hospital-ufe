@@ -48,6 +48,18 @@ import { VisitsApi, BedsApi, Bed, BedDepartmentEnum, Visit, Configuration } from
     md-list-item:focus-within {
       --md-list-item-container-color: var(--md-sys-color-surface-container-high);
     }
+    .supporting {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .meta,
+    .doctors,
+    .notes {
+      font-size: 0.82rem;
+      color: var(--md-sys-color-on-surface-variant);
+      line-height: 1.25;
+    }
     .empty,
     .error {
       padding: 18px 16px;
@@ -247,7 +259,11 @@ export class XpaucofVisitList {
                     [
                       <md-list-item type="button" onClick={() => this.visitClicked.emit(visit.id)}>
                         <div slot="headline">{visit.patientId}</div>
-                        <div slot="supporting-text">{visit.date} {visit.time} | Oddelenie: {this.getDepartmentDisplayName(visit.bedId)} | Lôžko: {this.getBedDisplayName(visit.bedId)}</div>
+                        <div slot="supporting-text" class="supporting">
+                          <div class="meta">{visit.date} {visit.time} | Oddelenie: {this.getDepartmentDisplayName(visit.bedId)} | Lôžko: {this.getBedDisplayName(visit.bedId)}</div>
+                          <div class="doctors">Lekári: {(visit.doctors && visit.doctors.length > 0) ? visit.doctors.join(', ') : 'nezadané'}</div>
+                          <div class="notes">Klinické poznámky: {visit.clinicalNotes?.trim() ? visit.clinicalNotes : 'nezadané'}</div>
+                        </div>
                         <md-icon slot="start">event</md-icon>
                       </md-list-item>,
                       <md-divider></md-divider>
