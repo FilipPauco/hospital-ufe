@@ -38,6 +38,12 @@ export interface Bed {
      */
     status: BedStatusEnum;
     /**
+     * Department where the bed belongs
+     * @type {string}
+     * @memberof Bed
+     */
+    department: BedDepartmentEnum;
+    /**
      * ID of the patient currently in the bed (if occupied)
      * @type {string}
      * @memberof Bed
@@ -56,6 +62,18 @@ export const BedStatusEnum = {
 } as const;
 export type BedStatusEnum = typeof BedStatusEnum[keyof typeof BedStatusEnum];
 
+/**
+ * @export
+ */
+export const BedDepartmentEnum = {
+    Interne: 'interne',
+    Chirurgicke: 'chirurgicke',
+    UrgentnyPrijem: 'urgentny-prijem',
+    Novorodenecke: 'novorodenecke',
+    Urazove: 'urazove'
+} as const;
+export type BedDepartmentEnum = typeof BedDepartmentEnum[keyof typeof BedDepartmentEnum];
+
 
 /**
  * Check if a given object implements the Bed interface.
@@ -65,6 +83,7 @@ export function instanceOfBed(value: object): boolean {
     isInstance = isInstance && "id" in value;
     isInstance = isInstance && "number" in value;
     isInstance = isInstance && "status" in value;
+    isInstance = isInstance && "department" in value;
 
     return isInstance;
 }
@@ -82,6 +101,7 @@ export function BedFromJSONTyped(json: any, ignoreDiscriminator: boolean): Bed {
         'id': json['id'],
         'number': json['number'],
         'status': json['status'],
+        'department': json['department'],
         'patientId': !exists(json, 'patientId') ? undefined : json['patientId'],
     };
 }
@@ -98,6 +118,7 @@ export function BedToJSON(value?: Bed | null): any {
         'id': value.id,
         'number': value.number,
         'status': value.status,
+        'department': value.department,
         'patientId': value.patientId,
     };
 }

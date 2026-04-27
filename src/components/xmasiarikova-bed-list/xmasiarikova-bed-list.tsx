@@ -1,5 +1,13 @@
 ﻿import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/core';
-import { BedsApi, Bed, Configuration } from '../../api/hospital-wl';
+import { BedsApi, Bed, BedDepartmentEnum, Configuration } from '../../api/hospital-wl';
+
+const BED_DEPARTMENTS: Array<{ id: BedDepartmentEnum; label: string }> = [
+  { id: BedDepartmentEnum.Interne, label: 'Interné' },
+  { id: BedDepartmentEnum.Chirurgicke, label: 'Chirurgické' },
+  { id: BedDepartmentEnum.UrgentnyPrijem, label: 'Urgentný príjem' },
+  { id: BedDepartmentEnum.Novorodenecke, label: 'Novorodenecké' },
+  { id: BedDepartmentEnum.Urazove, label: 'Úrazové' },
+];
 
 @Component({
   tag: 'xmasiarikova-bed-list',
@@ -27,6 +35,12 @@ import { BedsApi, Bed, Configuration } from '../../api/hospital-wl';
       flex-wrap: wrap;
     }
     h2 { margin: 0; font-size: 1.15rem; font-weight: 600; }
+    .filters {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
     .stats {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -85,14 +99,36 @@ import { BedsApi, Bed, Configuration } from '../../api/hospital-wl';
     md-list-item:focus-within {
       --md-list-item-container-color: var(--md-sys-color-surface-container-high);
     }
+    .supporting {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .department {
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 0.82rem;
+    }
+    .status {
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .status.free { color: #1f5d32; }
+    .status.occupied { color: #9b1c2e; }
+    .status.out-of-service { color: #8f5518; }
+    .patient {
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 0.82rem;
+    }
     .empty,
     .error {
       padding: 18px 16px;
       color: var(--md-sys-color-on-surface-variant);
     }
     .error {
-      color: var(--md-sys-color-error);
-      background: var(--md-sys-color-error-container);
+      color: #b42318;
+      background: #fef3f2;
+      border: 1px solid #fda29b;
+      font-weight: 600;
       border-radius: 12px;
       margin: 12px 16px 16px;
     }
@@ -108,6 +144,8 @@ export class XmasiarikovaBedList {
   @Prop() apiBase: string;
   @Prop() wardId: string;
   @State() errorMessage: string;
+  @State() selectedDepartment: BedDepartmentEnum | 'all' = 'all';
+  @State() selectedStatus: Bed['status'] | 'all' = 'all';
 
   beds: Bed[];
 
@@ -118,6 +156,15 @@ export class XmasiarikovaBedList {
       case 'out-of-service': return 'Mimo prevádzky';
       default: return status;
     }
+  }
+
+  private departmentLabel(department: string): string {
+    return BED_DEPARTMENTS.find((item) => item.id === this.normalizeDepartment(department))?.label ?? 'Interné';
+  }
+
+  private normalizeDepartment(department?: string): BedDepartmentEnum {
+    const normalized = BED_DEPARTMENTS.find((item) => item.id === department)?.id;
+    return normalized ?? BedDepartmentEnum.Interne;
   }
 
   private async getBedsAsync(): Promise<Bed[]> {
@@ -144,10 +191,16 @@ export class XmasiarikovaBedList {
   }
 
   render() {
-    const total = this.beds?.length ?? 0;
-    const occupied = this.beds?.filter((b) => b.status === 'occupied').length ?? 0;
-    const free = this.beds?.filter((b) => b.status === 'free').length ?? 0;
-    const oos = this.beds?.filter((b) => b.status === 'out-of-service').length ?? 0;
+    const filteredBeds = (this.beds ?? []).filter((bed) => {
+      const departmentMatch = this.selectedDepartment === 'all' || this.normalizeDepartment(bed.department) === this.selectedDepartment;
+      const statusMatch = this.selectedStatus === 'all' || bed.status === this.selectedStatus;
+      return departmentMatch && statusMatch;
+    });
+
+    const total = filteredBeds.length;
+    const occupied = filteredBeds.filter((b) => b.status === 'occupied').length;
+    const free = filteredBeds.filter((b) => b.status === 'free').length;
+    const oos = filteredBeds.filter((b) => b.status === 'out-of-service').length;
 
     return (
       <Host>
@@ -161,6 +214,45 @@ export class XmasiarikovaBedList {
                 Pridaj lôžko
               </md-filled-button>
             </div>
+
+            {!this.errorMessage && (
+              <div class="filters">
+                <md-filled-select label="Filtrovať podľa oddelenia"
+                  value={this.selectedDepartment}
+                  onchange={(ev: Event) => {
+                    this.selectedDepartment = (ev.target as HTMLSelectElement).value as BedDepartmentEnum | 'all';
+                  }}>
+                  <md-select-option value="all">
+                    <div slot="headline">Všetky oddelenia</div>
+                  </md-select-option>
+                  {BED_DEPARTMENTS.map((department) => (
+                    <md-select-option value={department.id}>
+                      <div slot="headline">{department.label}</div>
+                    </md-select-option>
+                  ))}
+                </md-filled-select>
+
+                <md-filled-select label="Filtrovať podľa stavu"
+                  value={this.selectedStatus}
+                  onchange={(ev: Event) => {
+                    this.selectedStatus = (ev.target as HTMLSelectElement).value as Bed['status'] | 'all';
+                  }}>
+                  <md-select-option value="all">
+                    <div slot="headline">Všetky stavy</div>
+                  </md-select-option>
+                  <md-select-option value="free">
+                    <div slot="headline">Voľné</div>
+                  </md-select-option>
+                  <md-select-option value="occupied">
+                    <div slot="headline">Obsadené</div>
+                  </md-select-option>
+                  <md-select-option value="out-of-service">
+                    <div slot="headline">Mimo prevádzky</div>
+                  </md-select-option>
+                </md-filled-select>
+              </div>
+            )}
+
             {!this.errorMessage && total > 0 && (
               <div class="stats">
                 <div class="stat-card occupied">
@@ -189,14 +281,18 @@ export class XmasiarikovaBedList {
           </div>
           {this.errorMessage
             ? <div class="error">{this.errorMessage}</div>
-            : total === 0
-              ? <div class="empty">Na oddelení zatiaľ nie sú evidované žiadne lôžka.</div>
+            : filteredBeds.length === 0
+              ? <div class="empty">Žiadne lôžka nevyhovujú zvolenému filtru.</div>
               : <md-list>
-                  {this.beds.map((bed) =>
+                  {filteredBeds.map((bed) =>
                     [
                       <md-list-item type="button" onClick={() => this.bedClicked.emit(bed.id)}>
                         <div slot="headline">Lôžko {bed.number}</div>
-                        <div slot="supporting-text">{this.statusLabel(bed.status)}{bed.patientId ? ` – ${bed.patientId}` : ''}</div>
+                        <div slot="supporting-text" class="supporting">
+                          <div class="department">Oddelenie: {this.departmentLabel(bed.department)}</div>
+                          <div class={`status ${bed.status}`}>{this.statusLabel(bed.status)}</div>
+                          {bed.patientId && <div class="patient">Pacient: {bed.patientId}</div>}
+                        </div>
                         <md-icon slot="start">{bed.status === 'free' ? 'bed' : bed.status === 'occupied' ? 'person' : 'block'}</md-icon>
                       </md-list-item>,
                       <md-divider></md-divider>

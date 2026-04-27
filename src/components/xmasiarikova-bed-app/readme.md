@@ -18,15 +18,15 @@
 
 ### Depends on
 
-- [xmesiarikova-bed-editor](../xmesiarikova-bed-editor)
-- [xmesiarikova-bed-list](../xmesiarikova-bed-list)
+- [xmasiarikova-bed-editor](../xmasiarikova-bed-editor)
+- [xmasiarikova-bed-list](../xmasiarikova-bed-list)
 
 ### Graph
 ```mermaid
 graph TD;
-  xmesiarikova-bed-app --> xmesiarikova-bed-editor
-  xmesiarikova-bed-app --> xmesiarikova-bed-list
-  style xmesiarikova-bed-app fill:#f9f,stroke:#333,stroke-width:4px
+  xmasiarikova-bed-app --> xmasiarikova-bed-editor
+  xmasiarikova-bed-app --> xmasiarikova-bed-list
+  style xmasiarikova-bed-app fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
 ----------------------------------------------

@@ -41,8 +41,10 @@ import { VisitsApi, BedsApi, Bed, Visit, Configuration } from '../../api/hospita
       margin-top: 8px;
     }
     .error {
-      color: var(--md-sys-color-error);
-      background: var(--md-sys-color-error-container);
+      color: #b42318;
+      background: #fef3f2;
+      border: 1px solid #fda29b;
+      font-weight: 600;
       border-radius: 12px;
       padding: 14px 16px;
       margin: 16px;

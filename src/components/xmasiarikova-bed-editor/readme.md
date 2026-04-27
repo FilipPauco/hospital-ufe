@@ -25,15 +25,15 @@
 
 ### Used by
 
- - [xmesiarikova-bed-app](../xmesiarikova-bed-app)
+ - [xmasiarikova-bed-app](../xmasiarikova-bed-app)
  - [xpaucof-hospital-app](../xpaucof-hospital-app)
 
 ### Graph
 ```mermaid
 graph TD;
-  xmesiarikova-bed-app --> xmesiarikova-bed-editor
-  xpaucof-hospital-app --> xmesiarikova-bed-editor
-  style xmesiarikova-bed-editor fill:#f9f,stroke:#333,stroke-width:4px
+  xmasiarikova-bed-app --> xmasiarikova-bed-editor
+  xpaucof-hospital-app --> xmasiarikova-bed-editor
+  style xmasiarikova-bed-editor fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
 ----------------------------------------------

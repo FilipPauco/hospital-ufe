@@ -1,5 +1,13 @@
 ﻿import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
-import { BedsApi, Bed, Configuration } from '../../api/hospital-wl';
+import { BedsApi, Bed, BedDepartmentEnum, Configuration } from '../../api/hospital-wl';
+
+const BED_DEPARTMENTS: Array<{ id: BedDepartmentEnum; label: string }> = [
+  { id: BedDepartmentEnum.Interne, label: 'Interné' },
+  { id: BedDepartmentEnum.Chirurgicke, label: 'Chirurgické' },
+  { id: BedDepartmentEnum.UrgentnyPrijem, label: 'Urgentný príjem' },
+  { id: BedDepartmentEnum.Novorodenecke, label: 'Novorodenecké' },
+  { id: BedDepartmentEnum.Urazove, label: 'Úrazové' },
+];
 
 @Component({
   tag: 'xmasiarikova-bed-editor',
@@ -26,11 +34,6 @@ import { BedsApi, Bed, Configuration } from '../../api/hospital-wl';
       font-size: 1.1rem;
       font-weight: 600;
     }
-    .sub-title {
-      margin-top: 4px;
-      color: var(--md-sys-color-on-surface-variant);
-      font-size: 0.9rem;
-    }
     form {
       display: flex;
       flex-direction: column;
@@ -46,8 +49,10 @@ import { BedsApi, Bed, Configuration } from '../../api/hospital-wl';
       margin-top: 8px;
     }
     .error {
-      color: var(--md-sys-color-error);
-      background: var(--md-sys-color-error-container);
+      color: #b42318;
+      background: #fef3f2;
+      border: 1px solid #fda29b;
+      font-weight: 600;
       border-radius: 12px;
       padding: 14px 16px;
       margin: 16px;
@@ -59,7 +64,7 @@ export class XmasiarikovaBedEditor {
   @Prop() wardId: string;
   @Prop() apiBase: string;
 
-  @Event({ eventName: "editor-closed" }) editorClosed: EventEmitter<string>;
+  @Event({ eventName: 'editor-closed' }) editorClosed: EventEmitter<string>;
   @State() entry: Bed;
   @State() errorMessage: string;
   @State() isValid: boolean;
@@ -71,13 +76,14 @@ export class XmasiarikovaBedEditor {
   }
 
   private async getBedAsync(): Promise<Bed> {
-    if (this.bedId === "@new") {
+    if (this.bedId === '@new') {
       this.isValid = false;
       this.entry = {
-        id: "@new",
-        number: "",
-        status: "free",
-        patientId: "",
+        id: '@new',
+        number: '',
+        status: 'free',
+        department: BedDepartmentEnum.Interne,
+        patientId: '',
       };
       return this.entry;
     }
@@ -96,20 +102,25 @@ export class XmasiarikovaBedEditor {
 
       if (response.raw.status < 299) {
         this.entry = await response.value();
+        if (!this.entry.department) {
+          this.entry.department = BedDepartmentEnum.Interne;
+        }
         this.isValid = true;
       } else {
         this.errorMessage = `Cannot retrieve bed: ${response.raw.statusText}`;
       }
     } catch (err: any) {
-      this.errorMessage = `Cannot retrieve bed: ${err.message || "unknown"}`;
+      this.errorMessage = `Cannot retrieve bed: ${err.message || 'unknown'}`;
     }
     return undefined;
   }
 
+
+
   private handleInputEvent(ev: InputEvent): string {
     const target = ev.target as HTMLInputElement;
     this.isValid = this.formElement?.reportValidity() ?? false;
-    return target?.value ?? "";
+    return target?.value ?? '';
   }
 
   private async deleteBed() {
@@ -118,32 +129,41 @@ export class XmasiarikovaBedEditor {
       const bedsApi = new BedsApi(configuration);
       const response = await bedsApi.deleteBedRaw({ wardId: this.wardId, bedId: this.bedId });
       if (response.raw.status < 299) {
-        this.editorClosed.emit("deleted");
+        this.editorClosed.emit('deleted');
       } else {
         this.errorMessage = `Cannot delete bed: ${response.raw.statusText}`;
       }
     } catch (err: any) {
-      this.errorMessage = `Cannot delete bed: ${err.message || "unknown"}`;
+      this.errorMessage = `Cannot delete bed: ${err.message || 'unknown'}`;
     }
   }
 
   private async updateBed() {
     try {
+      if (!this.entry || !this.entry.department) {
+        this.entry = { ...this.entry, department: BedDepartmentEnum.Interne };
+      }
+      
+      const bedToSend: Bed = {
+        ...this.entry,
+        department: this.entry.department as BedDepartmentEnum
+      };
+      
       const configuration = new Configuration({ basePath: this.apiBase });
       const bedsApi = new BedsApi(configuration);
       let response;
-      if (this.bedId === "@new") {
-        response = await bedsApi.createBedRaw({ wardId: this.wardId, bed: this.entry });
+      if (this.bedId === '@new') {
+        response = await bedsApi.createBedRaw({ wardId: this.wardId, bed: bedToSend });
       } else {
-        response = await bedsApi.updateBedRaw({ wardId: this.wardId, bedId: this.bedId, bed: this.entry });
+        response = await bedsApi.updateBedRaw({ wardId: this.wardId, bedId: this.bedId, bed: bedToSend });
       }
       if (response.raw.status < 299) {
-        this.editorClosed.emit("updated");
+        this.editorClosed.emit('updated');
       } else {
         this.errorMessage = `Cannot save bed: ${response.raw.statusText}`;
       }
     } catch (err: any) {
-      this.errorMessage = `Cannot save bed: ${err.message || "unknown"}`;
+      this.errorMessage = `Cannot save bed: ${err.message || 'unknown'}`;
     }
   }
 
@@ -159,9 +179,9 @@ export class XmasiarikovaBedEditor {
       <Host>
         <div class="panel">
           <div class="header">
-            <h2>{this.bedId === "@new" ? "Nové lôžko" : "Detail lôžka"}</h2>
+            <h2>{this.bedId === '@new' ? 'Nové lôžko' : 'Detail lôžka'}</h2>
           </div>
-          <form ref={el => this.formElement = el}>
+          <form ref={(el) => this.formElement = el}>
             <md-filled-text-field label="Číslo lôžka"
               required pattern=".*\S.*" value={this.entry?.number}
               oninput={(ev: InputEvent) => {
@@ -189,6 +209,25 @@ export class XmasiarikovaBedEditor {
               </md-select-option>
             </md-filled-select>
 
+            <md-filled-select label="Oddelenie" required
+              value={this.entry?.department}
+              onchange={(ev: Event) => {
+                const target = ev.target as any;
+                const newDept = target.value;
+                
+                if (newDept && this.entry) {
+                  this.entry.department = newDept as BedDepartmentEnum;
+                  this.entry = { ...this.entry };
+                  this.isValid = this.formElement?.reportValidity() ?? false;
+                }
+              }}>
+              {BED_DEPARTMENTS.map((department) => (
+                <md-select-option value={department.id}>
+                  <div slot="headline">{department.label}</div>
+                </md-select-option>
+              ))}
+            </md-filled-select>
+
             <md-filled-text-field label="ID pacienta"
               value={this.entry?.patientId}
               oninput={(ev: InputEvent) => {
@@ -204,13 +243,13 @@ export class XmasiarikovaBedEditor {
                 <md-icon slot="icon">save</md-icon>
                 Uložiť
               </md-filled-tonal-button>
-              {this.bedId !== "@new" &&
+              {this.bedId !== '@new' &&
                 <md-outlined-button onclick={() => this.deleteBed()}>
                   <md-icon slot="icon">delete</md-icon>
                   Zmazať
                 </md-outlined-button>
               }
-              <md-outlined-button onclick={() => this.editorClosed.emit("cancel")}>
+              <md-outlined-button onclick={() => this.editorClosed.emit('cancel')}>
                 <md-icon slot="icon">close</md-icon>
                 Zatvoriť
               </md-outlined-button>
