@@ -1,5 +1,13 @@
-import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
-import { VisitsApi, BedsApi, Bed, Visit, Configuration } from '../../api/hospital-wl';
+﻿import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
+import { VisitsApi, BedsApi, Bed, BedDepartmentEnum, Visit, Configuration } from '../../api/hospital-wl';
+
+const BED_DEPARTMENTS: Array<{ id: BedDepartmentEnum; label: string }> = [
+  { id: BedDepartmentEnum.Interne, label: 'Interné' },
+  { id: BedDepartmentEnum.Chirurgicke, label: 'Chirurgické' },
+  { id: BedDepartmentEnum.UrgentnyPrijem, label: 'Urgentný príjem' },
+  { id: BedDepartmentEnum.Novorodenecke, label: 'Novorodenecké' },
+  { id: BedDepartmentEnum.Urazove, label: 'Úrazové' },
+];
 
 @Component({
   tag: 'xpaucof-visit-editor',
@@ -69,6 +77,7 @@ export class XpaucofVisitEditor {
   @State() private beds: Bed[] = [];
   @State() private errorMessage: string = '';
   @State() private isValid: boolean = false;
+  @State() private selectedDepartment: BedDepartmentEnum | 'all' = 'all';
 
   private formElement?: HTMLFormElement;
 
@@ -77,6 +86,36 @@ export class XpaucofVisitEditor {
       this.getBedsAsync(),
       this.getVisitAsync(),
     ]);
+    this.syncDepartmentFromSelectedBed();
+  }
+
+  private normalizeDepartment(department?: string): BedDepartmentEnum {
+    const normalized = BED_DEPARTMENTS.find((d) => d.id === department)?.id;
+    return normalized ?? BedDepartmentEnum.Interne;
+  }
+
+  private departmentLabel(department?: string): string {
+    return BED_DEPARTMENTS.find((d) => d.id === this.normalizeDepartment(department))?.label ?? 'Interné';
+  }
+
+  private syncDepartmentFromSelectedBed(): void {
+    if (!this.entry?.bedId) {
+      this.selectedDepartment = 'all';
+      return;
+    }
+    const selectedBed = this.beds.find((b) => b.id === this.entry.bedId);
+    if (!selectedBed) {
+      this.selectedDepartment = 'all';
+      return;
+    }
+    this.selectedDepartment = this.normalizeDepartment(selectedBed.department);
+  }
+
+  private get visibleBeds(): Bed[] {
+    if (this.selectedDepartment === 'all') {
+      return this.beds;
+    }
+    return this.beds.filter((bed) => this.normalizeDepartment(bed.department) === this.selectedDepartment);
   }
 
   private async getBedsAsync(): Promise<void> {
@@ -155,7 +194,7 @@ export class XpaucofVisitEditor {
       'out-of-service': 'Mimo prevádzky',
     };
     const status = statusMap[bed.status ?? ''] ?? (bed.status ?? 'Neznámy stav');
-    return `${bed.number} (${status})`;
+    return `${bed.number} | ${this.departmentLabel(bed.department)} (${status})`;
   }
 
   private async deleteVisit() {
@@ -231,6 +270,31 @@ export class XpaucofVisitEditor {
               <md-icon slot="leading-icon">person</md-icon>
             </md-filled-text-field>
 
+            <md-filled-select label="Oddelenie"
+              value={this.selectedDepartment}
+              onchange={(ev: Event) => {
+                const newDepartment = (ev.target as HTMLSelectElement).value as BedDepartmentEnum | 'all';
+                this.selectedDepartment = newDepartment;
+
+                if (this.entry?.bedId && newDepartment !== 'all') {
+                  const selectedBed = this.beds.find((bed) => bed.id === this.entry.bedId);
+                  if (!selectedBed || this.normalizeDepartment(selectedBed.department) !== newDepartment) {
+                    this.entry.bedId = '';
+                  }
+                }
+
+                this.isValid = this.formElement?.reportValidity() ?? false;
+              }}>
+              <md-select-option value="all">
+                <div slot="headline">Všetky oddelenia</div>
+              </md-select-option>
+              {BED_DEPARTMENTS.map((department) => (
+                <md-select-option value={department.id}>
+                  <div slot="headline">{department.label}</div>
+                </md-select-option>
+              ))}
+            </md-filled-select>
+
             <md-filled-select label="Lôžko" required
               value={this.entry?.bedId ?? ''}
               onchange={(ev: Event) => {
@@ -242,7 +306,7 @@ export class XpaucofVisitEditor {
               <md-select-option value="">
                 <div slot="headline">Vyberte lôžko</div>
               </md-select-option>
-              {this.beds.map((bed) => (
+              {this.visibleBeds.map((bed) => (
                 <md-select-option value={bed.id}>
                   <div slot="headline">{this.getBedLabel(bed)}</div>
                 </md-select-option>

@@ -1,5 +1,5 @@
-import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/core';
-import { VisitsApi, BedsApi, Bed, Visit, Configuration } from '../../api/hospital-wl';
+﻿import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/core';
+import { VisitsApi, BedsApi, Bed, BedDepartmentEnum, Visit, Configuration } from '../../api/hospital-wl';
 
 @Component({
   tag: 'xpaucof-visit-list',
@@ -25,6 +25,12 @@ import { VisitsApi, BedsApi, Bed, Visit, Configuration } from '../../api/hospita
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
+    }
+    .filters {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
     }
     h2 { margin: 0; font-size: 1.15rem; font-weight: 600; }
     md-list { background: transparent; }
@@ -69,10 +75,39 @@ export class XpaucofVisitList {
   @State() private errorMessage: string = '';
   @State() private beds: Bed[] = [];
   @State() private visits: Visit[] = [];
+  @State() private selectedDepartment: BedDepartmentEnum | 'all' = 'all';
+  @State() private selectedBedId: string | 'all' = 'all';
+
+  private normalizeDepartment(department?: string): string {
+    const allowed = ['interne', 'chirurgicke', 'urgentny-prijem', 'novorodenecke', 'urazove'];
+    return allowed.includes(department ?? '') ? (department as string) : 'interne';
+  }
+
+  private getBedById(bedId: string): Bed | undefined {
+    return this.beds.find((b) => b.id === bedId);
+  }
 
   private getBedDisplayName(bedId: string): string {
-    const bed = this.beds.find((b) => b.id === bedId);
-    return bed?.number ?? 'Neznáme lôžko';
+    return this.getBedById(bedId)?.number ?? 'Neznáme lôžko';
+  }
+
+  private getDepartmentDisplayName(bedId: string): string {
+    const department = this.normalizeDepartment(this.getBedById(bedId)?.department);
+    const labels: Record<string, string> = {
+      interne: 'Interné',
+      chirurgicke: 'Chirurgické',
+      'urgentny-prijem': 'Urgentný príjem',
+      novorodenecke: 'Novorodenecké',
+      urazove: 'Úrazové',
+    };
+    return labels[department] ?? 'Interné';
+  }
+
+  private getAvailableBedsForFilter(): Bed[] {
+    if (this.selectedDepartment === 'all') {
+      return this.beds;
+    }
+    return this.beds.filter((bed) => this.normalizeDepartment(bed.department) === this.selectedDepartment);
   }
 
   private async getVisitsAsync(): Promise<Visit[]> {
@@ -131,7 +166,16 @@ export class XpaucofVisitList {
   }
 
   render() {
-    const total = this.visits.length;
+    const availableBeds = this.getAvailableBedsForFilter();
+    const filteredVisits = this.visits.filter((visit) => {
+      const bed = this.getBedById(visit.bedId);
+      const departmentMatch = this.selectedDepartment === 'all' ||
+        this.normalizeDepartment(bed?.department) === this.selectedDepartment;
+      const bedMatch = this.selectedBedId === 'all' || visit.bedId === this.selectedBedId;
+      return departmentMatch && bedMatch;
+    });
+
+    const total = filteredVisits.length;
 
     return (
       <Host>
@@ -145,17 +189,65 @@ export class XpaucofVisitList {
                 Pridaj vizitu
               </md-filled-button>
             </div>
+
+            {!this.errorMessage && (
+              <div class="filters">
+                <md-filled-select label="Filtrovať podľa oddelenia"
+                  value={this.selectedDepartment}
+                  onchange={(ev: Event) => {
+                    this.selectedDepartment = (ev.target as HTMLSelectElement).value as BedDepartmentEnum | 'all';
+                    if (this.selectedBedId !== 'all' &&
+                        !this.getAvailableBedsForFilter().some((bed) => bed.id === this.selectedBedId)) {
+                      this.selectedBedId = 'all';
+                    }
+                  }}>
+                  <md-select-option value="all">
+                    <div slot="headline">Všetky oddelenia</div>
+                  </md-select-option>
+                  <md-select-option value={BedDepartmentEnum.Interne}>
+                    <div slot="headline">Interné</div>
+                  </md-select-option>
+                  <md-select-option value={BedDepartmentEnum.Chirurgicke}>
+                    <div slot="headline">Chirurgické</div>
+                  </md-select-option>
+                  <md-select-option value={BedDepartmentEnum.UrgentnyPrijem}>
+                    <div slot="headline">Urgentný príjem</div>
+                  </md-select-option>
+                  <md-select-option value={BedDepartmentEnum.Novorodenecke}>
+                    <div slot="headline">Novorodenecké</div>
+                  </md-select-option>
+                  <md-select-option value={BedDepartmentEnum.Urazove}>
+                    <div slot="headline">Úrazové</div>
+                  </md-select-option>
+                </md-filled-select>
+
+                <md-filled-select label="Filtrovať podľa lôžka"
+                  value={this.selectedBedId}
+                  onchange={(ev: Event) => {
+                    this.selectedBedId = (ev.target as HTMLSelectElement).value || 'all';
+                  }}>
+                  <md-select-option value="all">
+                    <div slot="headline">Všetky lôžka</div>
+                  </md-select-option>
+                  {availableBeds.map((bed) => (
+                    <md-select-option value={bed.id}>
+                      <div slot="headline">Lôžko {bed.number}</div>
+                    </md-select-option>
+                  ))}
+                </md-filled-select>
+              </div>
+            )}
           </div>
           {this.errorMessage
             ? <div class="error">{this.errorMessage}</div>
             : total === 0
-              ? <div class="empty">Zatiaľ nie sú naplánované žiadne vizity.</div>
+              ? <div class="empty">Zatiaľ neexistujú vizity pre zvolený filter.</div>
               : <md-list>
-                  {this.visits.map((visit) =>
+                  {filteredVisits.map((visit) =>
                     [
                       <md-list-item type="button" onClick={() => this.visitClicked.emit(visit.id)}>
                         <div slot="headline">{visit.patientId}</div>
-                        <div slot="supporting-text">{visit.date} {visit.time} | Lôžko: {this.getBedDisplayName(visit.bedId)}</div>
+                        <div slot="supporting-text">{visit.date} {visit.time} | Oddelenie: {this.getDepartmentDisplayName(visit.bedId)} | Lôžko: {this.getBedDisplayName(visit.bedId)}</div>
                         <md-icon slot="start">event</md-icon>
                       </md-list-item>,
                       <md-divider></md-divider>
